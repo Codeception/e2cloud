@@ -1,12 +1,13 @@
 Feature('GitHub');
 
 Data(function*() {
-  for (let i = 0; i < 5; i ++) { // 5 tests
+  // generate 20 tests
+  for (let i = 0; i < 20; i ++) {
     yield {
       login: 'john' + i,
       toString: function() { return this.login }
     }
-  }
+  } // generating and launcging 5 TESTS
 }).Scenario('Login GitHub', (I, current) => {
   I.amOnPage('https://github.com');
   I.see('GitHub');

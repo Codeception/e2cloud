@@ -70,7 +70,6 @@ module.exports.getTests = (configPath) => {
   codecept.initGlobals(dir);
   Container.create(currentConfig, {});
   const mocha = Container.mocha();
-  // should be moved to run
   codecept.loadTests();
   mocha.files = codecept.testFiles;
   mocha.loadFiles();
@@ -82,4 +81,18 @@ module.exports.getTests = (configPath) => {
     }
   }
   return testNames;
+}
+
+/**
+ * Obtain ReportPortal config from CodeceptJS config
+ * Override to use custom config
+*/
+module.exports.getReportPortalConfig = (configPath) => {
+  const currentConfig = Config.load(configPath);
+
+  if (currentConfig && currentConfig.plugins && currentConfig.plugins.reportPortal) {
+    return currentConfig.plugins.reportPortal;
+  }
+
+  throw new Error("ReportPortal config can't be found");
 }

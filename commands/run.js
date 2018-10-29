@@ -1,4 +1,3 @@
-const { Codecept, Config, Container } = require('../index');
 const RPClient = require('reportportal-client');
 const signale = require('signale');
 const path = require('path');
@@ -14,15 +13,21 @@ async function run(configPath, opts) {
   const dir = path.join(process.cwd(), configPath || '');
   signale.info(`Starting from ${dir}`);
 
-
+  let testNames;
   let reportPortalConfig;
-  // connect to report portal
-  if (currentConfig && currentConfig.plugins && currentConfig.plugins.reportPortal) {
-    reportPortalConfig = currentConfig.plugins.reportPortal;
-  } else {
-    throw new Error("ReportPortal config can't be found");
+
+  // open index.js file to obtain test names and RP config
+  try {
+    const indexModule = require(path.join(dir, 'index.js'));
+    testNames = indexModule.getTests(configPath);
+    reportPortalConfig = indexModule.getReportPortalConfig(configPath);
+  } catch (err) {
+    signale.fatal(`Can't obtain functions from ${path.join(dir, 'index.js')}`);
+    signale.fatal("index.js should export 'getTests' and 'getReportPortalConfig' functions");
+    throw err;
   }
 
+  // start RP session
   signale.info('Starting ReportPortal session for ' + reportPortalConfig.project);
 
   const interactive = new signale.Signale({interactive: true, scope: 'interactive'});
@@ -47,13 +52,6 @@ async function run(configPath, opts) {
   signale.star(`Realtime report ${chalk.bold(resultUrl)}`);
   const spinner = ora('Starting tests...').start();
 
-  let testNames;
-  try {
-    testNames = require(path.join(dir, 'index.js')).getTests(configPath);
-  } catch (err) {
-    signale.fatal(`Can't obtain list of tests to run from ${path.join(dir, 'index.js')}`);
-    signale.fatal("index.js should export 'getTests' function which returns names for all tests");
-  }
 
   for (let testName of testNames) {
     const runParams = { testName, launchId: response.id };
