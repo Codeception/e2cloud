@@ -1,7 +1,7 @@
 {
   "name": "e2cloud",
   "version": "1.0.0",
-  "description": "Cloud runner for your end 2 end tests written with CodeceptJS",
+  "description": "Run your tests in parallel as cloud functions",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,9 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "cfonts": "^2.2.2",
-    "codeceptjs": "^1.4.4",
     "commander": "^2.19.0",
     "escape-string-regexp": "^1.0.5",
+    "npm-install-package": "^2.1.0",
     "ora": "^3.0.0",
     "reportportal-client": "^5.1.0",
     "signale": "^1.3.0"

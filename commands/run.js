@@ -14,11 +14,6 @@ async function run(configPath, opts) {
   const dir = path.join(process.cwd(), configPath || '');
   signale.info(`Starting from ${dir}`);
 
-  const currentConfig = Config.load(configPath);
-  const codecept = new Codecept(currentConfig, {});
-  codecept.initGlobals(dir);
-  Container.create(currentConfig, {});
-  const mocha = Container.mocha();
 
   let reportPortalConfig;
   // connect to report portal
@@ -29,19 +24,6 @@ async function run(configPath, opts) {
   }
 
   signale.info('Starting ReportPortal session for ' + reportPortalConfig.project);
-
-
-  // should be moved to run
-  codecept.loadTests();
-  mocha.files = codecept.testFiles;
-  mocha.loadFiles();
-  let testNames = []
-  for (let suite of mocha.suite.suites) {
-    for (let test of suite.tests) {
-      // to grep by full describe + it name
-      testNames.push(`${suite.title}: ${test.title}`);
-    }
-  }
 
   const interactive = new signale.Signale({interactive: true, scope: 'interactive'});
 
@@ -65,6 +47,14 @@ async function run(configPath, opts) {
   signale.star(`Realtime report ${chalk.bold(resultUrl)}`);
   const spinner = ora('Starting tests...').start();
 
+  let testNames;
+  try {
+    testNames = require(path.join(dir, 'index.js')).getTests(configPath);
+  } catch (err) {
+    signale.fatal(`Can't obtain list of tests to run from ${path.join(dir, 'index.js')}`);
+    signale.fatal("index.js should export 'getTests' function which returns names for all tests");
+  }
+
   for (let testName of testNames) {
     const runParams = { testName, launchId: response.id };
 
@@ -86,8 +76,6 @@ async function run(configPath, opts) {
         signale.star(`Report stored at ${chalk.bold(resultUrl)}`);
       }
     });
-
-
   }
 
   if (opts.dryRun) {

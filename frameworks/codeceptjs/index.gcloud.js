@@ -5,12 +5,15 @@
 const Container = require('codeceptjs').container;
 const Config = require('codeceptjs').config;
 const Codecept = require('codeceptjs').codecept;
-const event = require('codeceptjs').event;
 const escapeRe = require('escape-string-regexp');
 const path = require('path');
 
+/**
+ * Function to be executed in the cloud.
+ *
+ * Override it to customize execution
+ */
 module.exports.runTest = async (req, res) => {
-  let message = '';
 
   const testName = req.body.testName;
   const configFile = __dirname;
@@ -20,16 +23,14 @@ module.exports.runTest = async (req, res) => {
 
   let config = Config.load(configFile);
 
-
   config.grep = `^${escapeRe(`${testName}`.replace(/( \| {.+})?$/g, ''))}`;
-  config.teardown = (done) => {
-    res.send(message);
-  };
-
   if (config.helpers && config.helpers.Puppeteer) {
     config.helpers.Puppeteer.chrome = { args: ['--no-sandbox'] };
     config.helpers.Puppeteer.disableScreenshots = true; // temporary
   }
+
+  // todo add same config updates for webdriverio
+
 
   if (config.plugins && config.plugins.reportPortal) {
     config.plugins.reportPortal.enabled = true;
@@ -37,14 +38,6 @@ module.exports.runTest = async (req, res) => {
 
   // pass more verbose output
   let opts = { debug: true };
-
-  // a simple reporter, let's collect all passed and failed tests
-  event.dispatcher.on(event.test.passed, (test) => {
-    message += `"${test.title}" passed 😎`;
-  });
-  event.dispatcher.on(event.test.failed, (test) => {
-    message += `"${test.title}" failed 😭`;
-  });
 
   // create runner
   let codecept = new Codecept(config, opts);
@@ -62,4 +55,31 @@ module.exports.runTest = async (req, res) => {
 
   // run tests
   codecept.run();
+}
+
+/**
+* Provides test names for cloud running.
+* Executed by `run` command locally
+*
+* Override it to grep or filter tests
+*/
+module.exports.getTests = (configPath) => {
+
+  const currentConfig = Config.load(configPath);
+  const codecept = new Codecept(currentConfig, {});
+  codecept.initGlobals(dir);
+  Container.create(currentConfig, {});
+  const mocha = Container.mocha();
+  // should be moved to run
+  codecept.loadTests();
+  mocha.files = codecept.testFiles;
+  mocha.loadFiles();
+  let testNames = []
+  for (let suite of mocha.suite.suites) {
+    for (let test of suite.tests) {
+      // to grep by full describe + it name
+      testNames.push(`${suite.title}: ${test.title}`);
+    }
+  }
+  return testNames;
 }

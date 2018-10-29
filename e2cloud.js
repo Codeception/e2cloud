@@ -23,16 +23,19 @@ CFonts.say('e2cloud', {
 });
 
 
-program.command('init [path]')
-  .description('Prepare files for cloud execution [path]')
+// command which creates cloud function
+program.command('init <framework> [path]')
+  .description('Prepare tests for cloud execution using <framework> [path]')
   .action(require('./commands/init'));
 
+// command to deploy changes to cloud
 program.command('deploy [path]')
   .description('Deploy to cloud')
   .option('--verbose', 'output internal logging information')
   .option('--profile [value]', 'configuration profile to be used')
   .action(require('./commands/deploy'));
 
+// command to run tests in cloud
 program.command('run [path]')
   .description('Run all tests in cloud')
   .option('--dry-run', "Prepare tests but not execute them in cloud")

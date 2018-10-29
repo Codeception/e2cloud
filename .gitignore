@@ -1,9 +1,9 @@
 node_modules
 .vscode
 .idea
-example/output
-example/node_modules
-example/package_lock.json
+examples/codeceptjs/output
+examples/codeceptjs/node_modules
+examples/codeceptjs/package_lock.json
 .DS_Store
 package-lock.json
 yarn.lock
