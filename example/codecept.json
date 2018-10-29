@@ -1,0 +1,32 @@
+{
+  "tests": "./*_test.js",
+  "timeout": 10000,
+  "output": "./output",
+  "helpers": {
+    "Puppeteer": {
+      "url": "http://localhost",
+      "waitForNavigation": "domcontentloaded",
+      "windowSize": "1600x1200"
+    }
+  },
+  "include": {},
+  "bootstrap": false,
+  "mocha": {},
+  "name": "example",
+  "plugins": {
+    "reportPortal": {
+      "enabled": true,
+      "require": "codeceptjs-reportportal-client",
+      "token": "05e04d85-a59e-4757-8e92-b5e7096bfef0",
+      "endpoint": "http://web.demo.reportportal.io/api/v1",
+      "launch": "e2cloud_test",
+      "project": "davertmik_personal"
+    },
+    "retryFailedStep": {
+      "enabled": true,
+      "minTimeout": 1000
+    }
+
+  }
+
+}

@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "puppeteer": "^1.9.0",
+    "codeceptjs": "^1.4.4",
+    "escape-string-regexp": "^1.0.5",
+    "codeceptjs-reportportal-client": "^0.1.0"
+  }
+}
