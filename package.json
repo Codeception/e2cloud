@@ -2,7 +2,9 @@
   "name": "e2cloud",
   "version": "1.0.0",
   "description": "Run your tests in parallel as cloud functions",
-  "main": "index.js",
+  "bin": {
+    "e2cloud": "./e2cloud.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
